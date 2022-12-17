@@ -3,7 +3,7 @@ import os
 
 from notion_client import Client
 
-NOTION_TOKEN = os.environ["NOTION_TOKEN"]
+NOTION_TOKEN = os.environ.get("NOTION_TOKEN")
 
 
 def create_client(log_level: int = logging.WARNING) -> Client:
