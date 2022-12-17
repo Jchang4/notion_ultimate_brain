@@ -1,0 +1,7 @@
+.vscode
+.env
+**.ipynb_checkpoints
+**__pycache__
+**__init__.py
+
+notebooks
