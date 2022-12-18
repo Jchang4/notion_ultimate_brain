@@ -9,13 +9,13 @@ def dict_by(items: List[T], prop: str) -> Dict[Any, T]:
     return {getattr(item, prop): item for item in items}
 
 
-def assert_nonnull(item: Optional[T]) -> T:
-    assert item is not None
+def assert_nonnull(item: Optional[T], message: str = "") -> T:
+    assert item is not None, message
     return item
 
 
-def nonnulls(items: List[Optional[T]]) -> List[T]:
-    return [item for item in items if item]
+def nonnulls(items):
+    return [item for item in items if item is not None]
 
 
 def pipe(*funcs: Callable[[Any], Any]) -> Callable[[Any], Any]:

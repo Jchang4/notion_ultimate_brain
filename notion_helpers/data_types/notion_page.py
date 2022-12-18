@@ -12,8 +12,7 @@ class Page(NotionBase):
         return get_plain_text_from_title(title)
 
     def __repr__(self) -> str:
-        parent_repr = super().__repr__()
-        return f"<Page {parent_repr} num_props={len(self.id_to_properties)}>"
+        return super().__repr__(f"num_props={len(self.id_to_properties)}")
 
 
 def get_property_from_page(
