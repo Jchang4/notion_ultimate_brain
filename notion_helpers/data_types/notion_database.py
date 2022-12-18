@@ -1,8 +1,10 @@
-import asyncio
 from typing import Any, Dict, List
 
 from notion_client import Client
 
+from helpers import dict_by, nonnulls, pipe
+from notion_helpers.data_types.notion_properties.all import Property
+from notion_helpers.data_types.notion_properties.helpers import get_properties
 from notion_helpers.helpers import get_plain_text_from_title
 
 
@@ -14,7 +16,7 @@ class Database:
     parent: Dict[str, Any]
     url: str
     archived: bool
-    properties: Dict[str, Any]
+    properties: Dict[str, Property]
 
     def __init__(self, json_data: Dict[str, Any]):
         self._raw = json_data
@@ -24,7 +26,9 @@ class Database:
         self.parent = self._raw["parent"]
         self.url = self._raw["url"]
         self.archived = self._raw["archived"]
-        self.properties = self._raw["properties"]
+        self.properties = dict_by(
+            pipe(get_properties, nonnulls)(self._raw["properties"]), "id"
+        )
 
     @staticmethod
     def get_database_title(database: Dict[str, Any]) -> str:
