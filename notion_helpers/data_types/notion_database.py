@@ -1,4 +1,7 @@
-from typing import Any, Dict
+import asyncio
+from typing import Any, Dict, List
+
+from notion_client import Client
 
 from notion_helpers.helpers import get_plain_text_from_title
 
@@ -27,6 +30,21 @@ class Database:
     def get_database_title(database: Dict[str, Any]) -> str:
         return get_plain_text_from_title(database["title"])
 
+    @staticmethod
+    def get_all_databases(
+        notion: Client, query: str = "", page_size: int = 10
+    ) -> List["Database"]:
+        databases = notion.search(
+            query=query,
+            filter={
+                "property": "object",
+                "value": "database",
+            },
+            page_size=page_size,
+        )
+        assert isinstance(databases, dict)
+        return [Database(r) for r in databases["results"]]
+
     def __repr__(self) -> str:
         db_repr = f'id="{self.id}" title="{self.title}" archived={self.archived}'
 
@@ -34,5 +52,3 @@ class Database:
             return db_repr
 
         return f"<Database {db_repr}>"
-
-    
