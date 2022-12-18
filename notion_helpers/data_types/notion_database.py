@@ -16,7 +16,8 @@ class Database:
     parent: Dict[str, Any]
     url: str
     archived: bool
-    properties: Dict[str, Property]
+    id_to_properties: Dict[str, Property]
+    name_to_properties: Dict[str, Property]
 
     def __init__(self, json_data: Dict[str, Any]):
         self._raw = json_data
@@ -26,8 +27,11 @@ class Database:
         self.parent = self._raw["parent"]
         self.url = self._raw["url"]
         self.archived = self._raw["archived"]
-        self.properties = dict_by(
+        self.id_to_properties = dict_by(
             pipe(get_properties, nonnulls)(self._raw["properties"]), "id"
+        )
+        self.name_to_properties = dict_by(
+            pipe(get_properties, nonnulls)(self._raw["properties"]), "name"
         )
 
     @staticmethod

@@ -1,6 +1,12 @@
 from datetime import datetime
 
+from helpers import nonnulls
 from notion_helpers.data_types.notion_database import Database
+from notion_helpers.data_types.notion_properties.__tests__.helpers import (
+    DATABASE_PROPERTY_DATA,
+    PropertyTypes,
+)
+from notion_helpers.data_types.notion_properties.helpers import get_properties
 
 
 class TestDatabase:
@@ -30,7 +36,17 @@ class TestDatabase:
         "created_by": {"object": "user", "id": "user_id_1"},
         "last_edited_by": {"object": "user", "id": "user_id_1"},
         "last_edited_time": datetime.now().isoformat(),
-        "properties": {},
+        "properties": {
+            DATABASE_PROPERTY_DATA[PropertyTypes.DATE]["name"]: DATABASE_PROPERTY_DATA[
+                PropertyTypes.DATE
+            ],
+            DATABASE_PROPERTY_DATA[PropertyTypes.CREATED_TIME][
+                "name"
+            ]: DATABASE_PROPERTY_DATA[PropertyTypes.CREATED_TIME],
+            DATABASE_PROPERTY_DATA[PropertyTypes.URL]["name"]: DATABASE_PROPERTY_DATA[
+                PropertyTypes.URL
+            ],
+        },
         "url": "https://www.typed-notion-is-best-notion.com",
         "archived": False,
     }
@@ -38,12 +54,17 @@ class TestDatabase:
     def test_create_database_from_raw(self):
         d = Database(self.raw_database_data)
         assert d._raw == self.raw_database_data
-        database_vars = [v for v in vars(d).keys() if v != "_raw" and v != "title"]
-
-        for v in database_vars:
-            assert getattr(d, v) == self.raw_database_data[v]
-
+        assert d.id == self.raw_database_data["id"]
         assert d.title == self.raw_database_data["title"][0]["plain_text"]
+        assert d.parent == self.raw_database_data["parent"]
+        assert d.url == self.raw_database_data["url"]
+        assert d.archived == self.raw_database_data["archived"]
+
+        expected_properties = nonnulls(
+            get_properties(self.raw_database_data["properties"])
+        )
+        assert d.id_to_properties == {prop.id: prop for prop in expected_properties}
+        assert d.name_to_properties == {prop.name: prop for prop in expected_properties}
 
     def test_get_database_title(self):
         title = [

@@ -54,3 +54,15 @@ class Property:
         if issubclass(self.__class__, Property):
             return str_repr
         return f'<Property {str_repr} type="{str(self.type.value)}">'
+
+    def __eq__(self, other: "Property") -> bool:
+        self_props = vars(self)
+        other_props = vars(other)
+        if set(self_props) != set(other_props):
+            return False
+
+        for prop in self_props:
+            if getattr(self, prop) != getattr(other, prop):
+                return False
+
+        return True
