@@ -6,7 +6,15 @@ from notion_helpers.data_types.notion_properties.date_property import (
     DateProperty,
 )
 from notion_helpers.data_types.notion_properties.number_property import NumberProperty
-from notion_helpers.data_types.notion_properties.property import Property, PropertyTypes
+from notion_helpers.data_types.notion_properties.property import (
+    NotImplementedProperty,
+    Property,
+    PropertyTypes,
+)
+from notion_helpers.data_types.notion_properties.relation_property import (
+    RelationProperty,
+)
+from notion_helpers.data_types.notion_properties.rollup_property import RollupProperty
 from notion_helpers.data_types.notion_properties.url_property import UrlProperty
 
 
@@ -21,9 +29,13 @@ def property_switch(raw_property: Dict[str, Any]) -> Optional[Property]:
             return NumberProperty(raw_property)
         case PropertyTypes.URL:
             return UrlProperty(raw_property)
+        case PropertyTypes.RELATION:
+            return RelationProperty(raw_property)
+        case PropertyTypes.ROLLUP:
+            return RollupProperty(raw_property)
         case _:
             logging.warn(f'Property "{prop_type.value}" has no Python class')
-            return None
+            return NotImplementedProperty(raw_property)
 
 
 def get_properties(

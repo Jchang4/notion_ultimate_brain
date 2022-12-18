@@ -49,11 +49,16 @@ class Property:
     def get_value(self, payload: Any):
         raise NotImplementedError()
 
-    def __repr__(self) -> str:
+    def __repr__(
+        self,
+        extra_info: str = "",
+        class_name: str = "",
+    ) -> str:
         str_repr = f'id="{self.id}" name="{self.name}"'
-        if issubclass(self.__class__, Property):
-            return str_repr
-        return f'<Property {str_repr} type="{str(self.type.value)}">'
+        if extra_info:
+            str_repr += f" {extra_info}"
+        class_name = class_name if class_name else self.__class__.__name__
+        return f"<{class_name} {str_repr}>"
 
     def __eq__(self, other: "Property") -> bool:
         self_props = vars(self)
@@ -66,3 +71,11 @@ class Property:
                 return False
 
         return True
+
+
+class NotImplementedProperty(Property):
+    def get_value(self, payload: Any):
+        return payload
+
+    def __repr__(self) -> str:
+        return super().__repr__("NOT_IMPLEMENTED", f"{self.type.value.title()}Property")
