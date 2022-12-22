@@ -4,8 +4,8 @@ from notion_client import Client
 
 from notion_ultimate_brain.helpers import JSON
 from notion_ultimate_brain.notion.helpers import get_plain_text_from_title
+from notion_ultimate_brain.notion.mixins import WithRawPayloadMixin
 from notion_ultimate_brain.notion.property import WithProperties
-from notion_ultimate_brain.notion.types import WithRawPayloadMixin
 
 
 # For Databases and Pages

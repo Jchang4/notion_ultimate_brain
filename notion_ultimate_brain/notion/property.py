@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional
 from notion_client import Client
 
 from notion_ultimate_brain.helpers import JSON, PROPERTY_VALUE
-from notion_ultimate_brain.notion.types import WithClientMixin, WithRawPayloadMixin
+from notion_ultimate_brain.notion.mixins import WithClientMixin, WithRawPayloadMixin
 
 
 class PropertyTypes(str, Enum):

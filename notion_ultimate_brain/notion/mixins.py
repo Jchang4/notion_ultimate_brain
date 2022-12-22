@@ -2,7 +2,7 @@ from typing import Any
 
 from notion_client import Client
 
-from .helpers import JSON
+from notion_ultimate_brain.helpers import JSON
 
 
 class WithRawPayloadMixin:

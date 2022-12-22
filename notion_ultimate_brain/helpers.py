@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import Any, Dict, List, Tuple, TypeVar, Union
 
 from dateutil import parser
 
