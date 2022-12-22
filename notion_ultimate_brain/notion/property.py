@@ -1,8 +1,10 @@
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from notion_ultimate_brain.client import UltimateBrainNotionClient, WithClientMixin
-from notion_ultimate_brain.types import JSON, PROPERTY_VALUE, WithRawPayload
+from notion_client import Client
+
+from notion_ultimate_brain.helpers import JSON, PROPERTY_VALUE
+from notion_ultimate_brain.notion.types import WithClientMixin, WithRawPayloadMixin
 
 
 class PropertyTypes(str, Enum):
@@ -31,15 +33,13 @@ class PropertyTypes(str, Enum):
         return f'<PropertyType "{self.value}">'
 
 
-class Property(WithClientMixin, WithRawPayload):
+class Property(WithClientMixin, WithRawPayloadMixin):
     id: str
     name: str
     type: PropertyTypes
     value: PROPERTY_VALUE
 
-    def __init__(
-        self, notion: UltimateBrainNotionClient, json_data: JSON, prop_name: str
-    ):
+    def __init__(self, notion: Client, json_data: JSON, prop_name: str):
         super().__init__(notion=notion, raw=json_data)
 
         self.id = self._raw["id"]
@@ -84,7 +84,7 @@ class WithProperties(WithClientMixin):
         super().__init__(**kwargs)
         self.id_to_property = {}
         for prop_name, prop in properties.items():
-            prop = Property(self._notion, prop, prop_name)
+            prop = Property(self.notion, prop, prop_name)
             self.id_to_property[prop.id] = prop
 
     def get_prop_by_id(self, prop_id: str) -> Property:

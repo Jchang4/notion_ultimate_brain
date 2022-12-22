@@ -1,16 +1,16 @@
 from typing import Any, List
 
-from notion_ultimate_brain.client import UltimateBrainNotionClient
+from notion_client import Client
+
+from notion_ultimate_brain.helpers import JSON
 from notion_ultimate_brain.notion.helpers import get_plain_text_from_title
 from notion_ultimate_brain.notion.property import WithProperties
-from notion_ultimate_brain.types import JSON, WithRawPayload
+from notion_ultimate_brain.notion.types import WithRawPayloadMixin
 
 
 # For Databases and Pages
-class NotionBase(WithProperties, WithRawPayload):
-    def __init__(
-        self, notion: UltimateBrainNotionClient, data: JSON, **kargs: Any
-    ) -> None:
+class NotionBase(WithProperties, WithRawPayloadMixin):
+    def __init__(self, notion: Client, data: JSON, **kargs: Any) -> None:
         super().__init__(
             notion=notion,
             raw=data,

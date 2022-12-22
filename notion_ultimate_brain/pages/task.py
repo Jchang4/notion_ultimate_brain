@@ -1,41 +1,37 @@
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
+import notion_ultimate_brain.databases as databases
 from notion_ultimate_brain.constants import UB_TASKS_DATABASE
 from notion_ultimate_brain.helpers import (
+    JSON,
     dict_by,
     get_start_and_end_of_day,
+    query_filter_merge,
     to_notion_strftime,
 )
-from notion_ultimate_brain.notion.page import NotionPage
-from notion_ultimate_brain.types import JSON
+from notion_ultimate_brain.notion.all import NotionPage
 
 
 class WithTasks(NotionPage):
     base_task_filter: Dict[str, Any]
 
-    def get_tasks(
-        self, query_filter: Optional[List[JSON]] = None
-    ) -> Dict[str, "TaskPage"]:
-        from notion_ultimate_brain.databases import NotionDatabase, TasksDatabase
-
-        task_filter = [self.base_task_filter]
-        if query_filter:
-            task_filter += query_filter
-        print({"and": task_filter})
-        response = self._notion.databases.query(
+    def get_tasks(self, query_filter: Optional[JSON] = None) -> Dict[str, "TaskPage"]:
+        task_filter = query_filter_merge(
+            {"and": [self.base_task_filter]},
+            query_filter if query_filter else {},
+        )
+        response = self.notion.databases.query(
             **{
                 "database_id": UB_TASKS_DATABASE,
-                "filter": {"and": task_filter},
+                "filter": task_filter,
             }
         )
         assert isinstance(response, dict)
         return dict_by(
             [
                 TaskPage(
-                    TasksDatabase(
-                        NotionDatabase(self._notion, {"id": UB_TASKS_DATABASE})
-                    ),
+                    databases.TasksDatabase(self.notion, {"id": UB_TASKS_DATABASE}),
                     page_data,
                 )
                 for page_data in response["results"]
@@ -49,22 +45,22 @@ class WithTasks(NotionPage):
 
     def get_current_tasks(
         self,
-        query_filter: Optional[List[JSON]] = None,
+        query_filter: Optional[JSON] = None,
         include_done: bool = False,
         include_kanban_done: bool = False,
     ) -> Dict[str, "TaskPage"]:
-        task_filter = []
+        task_filter = {"and": []}
 
         if not include_done:
-            task_filter.append(
+            task_filter["and"].append(
                 {"property": "Done", "checkbox": {"equals": False}},
             )
         if not include_kanban_done:
-            task_filter.append(
+            task_filter["and"].append(
                 {"property": "Kanban Status", "select": {"does_not_equal": "Done"}},
             )
         if query_filter:
-            task_filter += query_filter
+            task_filter = query_filter_merge(task_filter, query_filter)
 
         return self.get_tasks(task_filter)
 
@@ -76,7 +72,11 @@ class WithTasks(NotionPage):
     ) -> Dict[str, "TaskPage"]:
         _, end_date = get_start_and_end_of_day(offset_days=offset_days)
         return self.get_current_tasks(
-            [WithTasks._get_date_filter(end_date=end_date - timedelta(minutes=1))],
+            {
+                "and": [
+                    WithTasks._get_date_filter(end_date=end_date - timedelta(minutes=1))
+                ]
+            },
             include_done,
             include_kanban_done,
         )
@@ -98,17 +98,19 @@ class WithTasks(NotionPage):
     def get_completed_tasks(
         self, start_date: Optional[datetime] = None, end_date: Optional[datetime] = None
     ) -> Dict[str, "TaskPage"]:
-        or_query_filter = [
-            {"property": "Done", "checkbox": {"equals": True}},
-            {"property": "Kanban Status", "select": {"equals": "Done"}},
-        ]
-        and_query_filter = []
+        task_filter = {
+            "or": [
+                {"property": "Done", "checkbox": {"equals": True}},
+                {"property": "Kanban Status", "select": {"equals": "Done"}},
+            ],
+            "and": [],
+        }
 
         if start_date or end_date:
-            and_query_filter.append(self._get_date_filter(start_date, end_date))
+            task_filter["and"].append(self._get_date_filter(start_date, end_date))
 
         return self.get_current_tasks(
-            and_query_filter + [{"or": or_query_filter}],
+            task_filter,
             include_done=True,
             include_kanban_done=True,
         )

@@ -1,4 +1,3 @@
-import logging
 from typing import Any, Dict, List, Optional
 
 from notion_ultimate_brain.constants import (
@@ -7,31 +6,27 @@ from notion_ultimate_brain.constants import (
     UB_MILESTONES_DATABASE,
     UB_NOTES_DATABASE,
     UB_PROJECTS_DATABASE,
-    UB_ROOT_BLOCK_ID,
     UB_TASKS_DATABASE,
 )
-from notion_ultimate_brain.helpers import get_day_midnight, nonnulls, to_notion_strftime
-from notion_ultimate_brain.notion.database import NotionDatabase
-from notion_ultimate_brain.notion.page import NotionPage
-from notion_ultimate_brain.pages.project import ProjectPage
-from notion_ultimate_brain.pages.task import TaskPage
+from notion_ultimate_brain.helpers import get_day_midnight, to_notion_strftime
+from notion_ultimate_brain.notion.all import NotionDatabase, NotionPage
+from notion_ultimate_brain.pages.all import ProjectPage, TaskPage
 
 
 class UltimateBrainDatabase(NotionDatabase):
-    def __init__(self, database: NotionDatabase):
-        for key, value in vars(database).items():
-            setattr(self, key, value)
+    database_id: str
 
 
 class NotesDatabase(UltimateBrainDatabase):
-    pass
+    database_id: str = UB_NOTES_DATABASE
 
 
 class MilestonesDatabase(UltimateBrainDatabase):
-    pass
+    database_id: str = UB_MILESTONES_DATABASE
 
 
 class ProjectsDatabase(UltimateBrainDatabase):
+    database_id: str = UB_PROJECTS_DATABASE
     id_to_page: Dict[str, ProjectPage]
 
     def _update_id_to_pages(self, pages: List[NotionPage]) -> None:
@@ -71,6 +66,7 @@ class ProjectsDatabase(UltimateBrainDatabase):
 
 
 class TasksDatabase(UltimateBrainDatabase):
+    database_id: str = UB_TASKS_DATABASE
     id_to_page: Dict[str, TaskPage]
 
     def get_pages(
@@ -87,59 +83,8 @@ class TasksDatabase(UltimateBrainDatabase):
 
 
 class GoalsDatabase(UltimateBrainDatabase):
-    pass
+    database_id: str = UB_GOALS_DATABASE
 
 
 class AreasAndResourcesDatabase(UltimateBrainDatabase):
-    pass
-
-
-def ub_database_switch(database: NotionDatabase) -> Optional[UltimateBrainDatabase]:
-    if database.id == UB_NOTES_DATABASE:
-        return NotesDatabase(database)
-    elif database.id == UB_MILESTONES_DATABASE:
-        return MilestonesDatabase(database)
-    elif database.id == UB_PROJECTS_DATABASE:
-        return ProjectsDatabase(database)
-    elif database.id == UB_TASKS_DATABASE:
-        return TasksDatabase(database)
-    elif database.id == UB_GOALS_DATABASE:
-        return GoalsDatabase(database)
-    elif database.id == UB_AREAS_AND_RESOURCES_DATABASE:
-        return AreasAndResourcesDatabase(database)
-    else:
-        logging.warn(
-            f'Unrecognized Ultimate Brain Database: {database.id} - "{database.title}"'
-        )
-        return None
-
-
-from notion_ultimate_brain.client import UltimateBrainNotionClient
-
-
-def get_all_databases(
-    notion: UltimateBrainNotionClient, query: str = "", page_size: int = 10
-) -> List[NotionDatabase]:
-
-    databases = notion.search(
-        query=query,
-        filter={
-            "property": "object",
-            "value": "database",
-        },
-        page_size=page_size,
-    )
-    assert isinstance(databases, dict)
-
-    return [NotionDatabase(notion=notion, data=data) for data in databases["results"]]
-
-
-def get_ub_databases(
-    notion: UltimateBrainNotionClient, with_archived: bool = False
-) -> List[UltimateBrainDatabase]:
-    databases = get_all_databases(notion)
-    databases = [d for d in databases if d.parent.get("block_id") == UB_ROOT_BLOCK_ID]
-    databases = nonnulls(map(ub_database_switch, databases))
-    if with_archived:
-        return databases
-    return [db for db in databases if not db.archived]
+    database_id: str = UB_AREAS_AND_RESOURCES_DATABASE

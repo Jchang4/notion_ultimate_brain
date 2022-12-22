@@ -1,5 +1,7 @@
 import os
 
+NOTION_TOKEN = os.environ.get("NOTION_TOKEN")
+
 UB_ROOT_BLOCK_ID = os.environ["UB_ROOT_BLOCK_ID"]
 
 # Ultimate Brain Databases

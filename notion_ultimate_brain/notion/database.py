@@ -1,17 +1,16 @@
 from typing import Any, Dict, List, Optional
 
-from notion_ultimate_brain.client import UltimateBrainNotionClient
+from notion_client import Client
+
+from notion_ultimate_brain.helpers import JSON
 from notion_ultimate_brain.notion.base import NotionBase
 from notion_ultimate_brain.notion.page import NotionPage
-from notion_ultimate_brain.types import JSON
 
 
 class NotionDatabase(NotionBase):
     id_to_page: Dict[str, NotionPage]
 
-    def __init__(
-        self, notion: UltimateBrainNotionClient, data: JSON, **kargs: Any
-    ) -> None:
+    def __init__(self, notion: Client, data: JSON, **kargs: Any) -> None:
         super().__init__(notion=notion, data=data, **kargs)
         self.id_to_page = {}
 
@@ -22,7 +21,7 @@ class NotionDatabase(NotionBase):
     def get_pages(
         self, query_filter: Optional[Dict[str, Any]] = None
     ) -> Dict[str, NotionPage]:
-        response = self._notion.databases.query(self.id, filter=query_filter)
+        response = self.notion.databases.query(self.id, filter=query_filter)
         assert isinstance(response, dict)
         pages = []
         for data in response["results"]:

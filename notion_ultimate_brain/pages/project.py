@@ -1,7 +1,7 @@
 from typing import Any
 
+from notion_ultimate_brain.helpers import JSON
 from notion_ultimate_brain.pages.task import WithTasks
-from notion_ultimate_brain.types import JSON
 
 
 class ProjectPage(WithTasks):

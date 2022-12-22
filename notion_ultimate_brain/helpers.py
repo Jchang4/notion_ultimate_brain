@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, TypeVar
+from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
 
 from dateutil import parser
 
+JSON = Dict[str, Any]
+PROPERTY_VALUE = Union[str, int, float, JSON, List[JSON], List[str]]
 T = TypeVar("T")
 
 
@@ -33,4 +35,17 @@ def get_day_midnight(strftime: str = "", offset_days: int = 0) -> datetime:
 
 def get_start_and_end_of_day(offset_days: int = 0) -> Tuple[datetime, datetime]:
     day = get_day_midnight(offset_days=offset_days)
-    return day, day + timedelta(days=1)
+    return day, day.replace(hour=23, minute=59, second=59)
+
+
+def query_filter_merge(*dicts) -> JSON:
+    result = {
+        "and": [],
+        "or": [],
+    }
+    for d in dicts:
+        if "and" in d:
+            result["and"] += d["and"]
+        if "or" in d:
+            result["or"] += d["or"]
+    return result

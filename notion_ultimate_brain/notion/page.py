@@ -1,10 +1,9 @@
 from typing import Any, List
 
-from notion_ultimate_brain.helpers import flatten
+from notion_ultimate_brain.helpers import JSON, flatten
 from notion_ultimate_brain.notion.base import NotionBase
 from notion_ultimate_brain.notion.helpers import get_plain_text_from_title
 from notion_ultimate_brain.notion.property import PropertyTypes
-from notion_ultimate_brain.types import JSON
 
 
 class NotionPage(NotionBase):
@@ -13,7 +12,7 @@ class NotionPage(NotionBase):
 
         assert isinstance(database, NotionDatabase)
 
-        super().__init__(database._notion, data, **kargs)
+        super().__init__(database.notion, data, **kargs)
 
         self.database = database
 
