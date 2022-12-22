@@ -6,7 +6,6 @@ On top of the Ultimate Brain specific features, you have full access to the [`no
 # Demo
 https://user-images.githubusercontent.com/19507255/209216335-ca078aef-1eb9-4650-b4c7-a8c16e768f0c.mp4
 
-
 # Installation
 ```bash
 git clone <repo> && cd <repo> && pip install notion_client
