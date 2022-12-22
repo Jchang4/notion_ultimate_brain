@@ -4,5 +4,6 @@
 **__pycache__
 **__init__.py
 **.DS_Store
+**.egg-info
 
 notebooks
