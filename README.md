@@ -4,7 +4,7 @@ This is a Python API to interact with [Thomas Frank's Ultimate Brain Notion Temp
 On top of the Ultimate Brain specific features, you have full access to the [`notion_client`]() API to access all of your Notion databases and pages. 
 
 # Demo
-![Example with Workout Scheduler](https://user-images.githubusercontent.com/19507255/209216335-ca078aef-1eb9-4650-b4c7-a8c16e768f0c.mp4)
+https://user-images.githubusercontent.com/19507255/209216335-ca078aef-1eb9-4650-b4c7-a8c16e768f0c.mp4
 
 
 # Installation
