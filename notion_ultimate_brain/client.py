@@ -7,23 +7,24 @@ from typing import Any, List, Optional
 from notion_client import Client
 
 from notion_ultimate_brain.constants import UB_ROOT_BLOCK_ID
-from notion_ultimate_brain.databases import (
-    AreasAndResourcesDatabase,
+from notion_ultimate_brain.databases.all import (
+    AreasDatabase,
     GoalsDatabase,
     MilestonesDatabase,
     NotesDatabase,
-    NotionDatabase,
     ProjectsDatabase,
+    ResourcesDatabase,
     TasksDatabase,
     UltimateBrainDatabase,
 )
-from notion_ultimate_brain.helpers import nonnulls
+from notion_ultimate_brain.notion.all import NotionDatabase
 
 NOTION_TOKEN = os.environ.get("NOTION_TOKEN")
 
 
 class UltimateBrainNotionClient(Client):
-    areas_and_resources: AreasAndResourcesDatabase
+    areas: AreasDatabase
+    resources: ResourcesDatabase
     goals: GoalsDatabase
     milestones: MilestonesDatabase
     notes: NotesDatabase
@@ -32,40 +33,36 @@ class UltimateBrainNotionClient(Client):
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(auth=NOTION_TOKEN, **kwargs)
-        self.areas_and_resources = AreasAndResourcesDatabase(self)
+        self.areas = AreasDatabase(self)
         self.goals = GoalsDatabase(self)
         self.milestones = MilestonesDatabase(self)
         self.notes = NotesDatabase(self)
         self.projects = ProjectsDatabase(self)
+        self.resources = ResourcesDatabase(self)
         self.tasks = TasksDatabase(self)
 
     def _ub_database_switch(
         self, database: NotionDatabase
     ) -> Optional[UltimateBrainDatabase]:
         if database.id == NotesDatabase.database_id:
-            ub_database = NotesDatabase(self, database._raw)
-            self.notes = ub_database
-            return ub_database
+            self.notes = NotesDatabase(self, database._raw)
+            return self.notes
         elif database.id == MilestonesDatabase.database_id:
-            ub_database = MilestonesDatabase(self, database._raw)
-            self.milestones = ub_database
-            return ub_database
+            self.milestones = MilestonesDatabase(self, database._raw)
+            return self.milestones
         elif database.id == ProjectsDatabase.database_id:
-            ub_database = ProjectsDatabase(self, database._raw)
-            self.projects = ub_database
-            return ub_database
+            self.projects = ProjectsDatabase(self, database._raw)
+            return self.projects
         elif database.id == TasksDatabase.database_id:
-            ub_database = TasksDatabase(self, database._raw)
-            self.tasks = ub_database
-            return ub_database
+            self.tasks = TasksDatabase(self, database._raw)
+            return self.tasks
         elif database.id == GoalsDatabase.database_id:
-            ub_database = GoalsDatabase(self, database._raw)
-            self.goals = ub_database
-            return ub_database
-        elif database.id == AreasAndResourcesDatabase.database_id:
-            ub_database = AreasAndResourcesDatabase(self, database._raw)
-            self.areas_and_resources = ub_database
-            return ub_database
+            self.goals = GoalsDatabase(self, database._raw)
+            return self.goals
+        elif database.id == AreasDatabase.database_id:
+            self.areas = AreasDatabase(self, database._raw)
+            self.resources = ResourcesDatabase(self, database._raw)
+            return self.areas
         else:
             logging.error(
                 f'Unrecognized Ultimate Brain Database: {database.id} - "{database.title}"'
@@ -76,12 +73,13 @@ class UltimateBrainNotionClient(Client):
     ) -> List[UltimateBrainDatabase]:
         databases = self.get_all_databases(page_size=page_size)
         databases = [
-            d for d in databases if d.parent.get("block_id") == UB_ROOT_BLOCK_ID
+            self._ub_database_switch(d)
+            for d in databases
+            if d.parent.get("block_id") == UB_ROOT_BLOCK_ID
         ]
-        databases = nonnulls(map(self._ub_database_switch, databases))
         if with_archived:
-            return databases
-        return [db for db in databases if not db.archived]
+            return self.ub_databases
+        return [db for db in self.ub_databases if not db.archived]
 
     def get_all_databases(
         self, query: str = "", page_size: int = 10
@@ -97,3 +95,15 @@ class UltimateBrainNotionClient(Client):
         assert isinstance(databases, dict)
 
         return [NotionDatabase(notion=self, data=data) for data in databases["results"]]
+
+    @property
+    def ub_databases(self) -> List[UltimateBrainDatabase]:
+        return [
+            self.areas,
+            self.resources,
+            self.goals,
+            self.milestones,
+            self.notes,
+            self.projects,
+            self.tasks,
+        ]
