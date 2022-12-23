@@ -1,9 +1,8 @@
-from typing import Any, List
+from typing import Any, Dict, List
 
 from notion_client import Client
 
 from notion_ultimate_brain.helpers import JSON
-from notion_ultimate_brain.notion.helpers import get_plain_text_from_title
 from notion_ultimate_brain.notion.mixins import WithRawPayloadMixin
 from notion_ultimate_brain.notion.property import WithProperties
 
@@ -24,7 +23,11 @@ class NotionBase(WithProperties, WithRawPayloadMixin):
         self.archived = data.get("archived", False)
 
     def format_title(self, title: List[JSON]) -> str:
-        return get_plain_text_from_title(title)
+        return self._get_plain_text_from_title(title)
+
+    @staticmethod
+    def _get_plain_text_from_title(title: List[Dict[str, Any]]) -> str:
+        return " ".join([t["plain_text"] for t in title])
 
     def __repr__(self, extra_str: str = "", class_name: str = "") -> str:
         class_name = class_name if class_name else self.__class__.__name__

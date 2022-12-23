@@ -1,5 +1,7 @@
 from typing import Any, Dict, List, Optional
 
+from notion_client import Client
+
 from notion_ultimate_brain.constants import (
     UB_AREAS_AND_RESOURCES_DATABASE,
     UB_GOALS_DATABASE,
@@ -8,13 +10,20 @@ from notion_ultimate_brain.constants import (
     UB_PROJECTS_DATABASE,
     UB_TASKS_DATABASE,
 )
-from notion_ultimate_brain.helpers import get_day_midnight, to_notion_strftime
+from notion_ultimate_brain.helpers import JSON, get_day_midnight, to_notion_strftime
 from notion_ultimate_brain.notion.all import NotionDatabase, NotionPage
 from notion_ultimate_brain.pages.all import ProjectPage, TaskPage
 
 
 class UltimateBrainDatabase(NotionDatabase):
     database_id: str
+
+    def __init__(
+        self, notion: Client, data: Optional[JSON] = None, **kargs: Any
+    ) -> None:
+        if not data:
+            data = {"id": self.database_id}
+        super().__init__(notion, data, **kargs)
 
 
 class NotesDatabase(UltimateBrainDatabase):

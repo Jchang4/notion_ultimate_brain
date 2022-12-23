@@ -2,7 +2,6 @@ from typing import Any, List
 
 from notion_ultimate_brain.helpers import JSON, flatten
 from notion_ultimate_brain.notion.base import NotionBase
-from notion_ultimate_brain.notion.helpers import get_plain_text_from_title
 from notion_ultimate_brain.notion.property import PropertyTypes
 
 
@@ -20,5 +19,5 @@ class NotionPage(NotionBase):
         titles = self.get_props_by_type(PropertyTypes.TITLE)
         titles = [t._raw["title"] for t in titles]
         titles = flatten(titles)
-        return get_plain_text_from_title(titles)
+        return self._get_plain_text_from_title(titles)
     

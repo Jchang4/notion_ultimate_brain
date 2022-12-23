@@ -23,8 +23,21 @@ NOTION_TOKEN = os.environ.get("NOTION_TOKEN")
 
 
 class UltimateBrainNotionClient(Client):
+    areas_and_resources: AreasAndResourcesDatabase
+    goals: GoalsDatabase
+    milestones: MilestonesDatabase
+    notes: NotesDatabase
+    projects: ProjectsDatabase
+    tasks: TasksDatabase
+
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(auth=NOTION_TOKEN, **kwargs)
+        self.areas_and_resources = AreasAndResourcesDatabase(self)
+        self.goals = GoalsDatabase(self)
+        self.milestones = MilestonesDatabase(self)
+        self.notes = NotesDatabase(self)
+        self.projects = ProjectsDatabase(self)
+        self.tasks = TasksDatabase(self)
 
     def _ub_database_switch(
         self, database: NotionDatabase
