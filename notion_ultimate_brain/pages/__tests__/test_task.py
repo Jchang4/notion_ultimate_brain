@@ -13,7 +13,7 @@ from notion_ultimate_brain.pages.task import TaskPage, WithTasksMixin
 
 
 @pytest.fixture(name='get_tasks')
-def get_tasks_fixture(mocker: MockerFixture):
+def get_tasks_fixture(mocker: MockerFixture) -> MagicMock:
     get_tasks = mocker.patch(
         "notion_ultimate_brain.pages.task.WithTasksMixin.get_tasks", return_value={}
     )
@@ -88,7 +88,7 @@ class TestWithTasksMixin:
             filter={"and": [expected_base_task_filter], "or": []},
         )
 
-    def test_get_current_tasks(self, notion: MagicMock, get_tasks):
+    def test_get_current_tasks(self, notion: MagicMock, get_tasks: MagicMock):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
 
         expected_query_filter = {
@@ -102,7 +102,7 @@ class TestWithTasksMixin:
             query_filter=expected_query_filter,
         )
 
-    def test_get_current_tasks__include_done(self, notion: MagicMock, get_tasks):
+    def test_get_current_tasks__include_done(self, notion: MagicMock, get_tasks: MagicMock):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
 
         expected_query_filter = {
@@ -116,7 +116,7 @@ class TestWithTasksMixin:
         )
 
     def test_get_current_tasks__include_kanban_done(
-        self, notion: MagicMock, get_tasks
+        self, notion: MagicMock, get_tasks: MagicMock
     ):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         expected_query_filter = {
@@ -130,7 +130,7 @@ class TestWithTasksMixin:
         )
 
     def test_get_current_tasks__include_both_done_and_kanban_done(
-        self, notion: MagicMock, get_tasks
+        self, notion: MagicMock, get_tasks: MagicMock
     ):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         expected_query_filter = {"and": []}
@@ -139,7 +139,7 @@ class TestWithTasksMixin:
             query_filter=expected_query_filter,
         )
 
-    def test_get_current_tasks_with_offset(self, notion: MagicMock, get_tasks):
+    def test_get_current_tasks_with_offset(self, notion: MagicMock, get_tasks: MagicMock):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         page.get_current_tasks_with_offset()
 
@@ -159,7 +159,7 @@ class TestWithTasksMixin:
             query_filter=expected_query_filter,
         )
 
-    def test_yesterday_tasks(self, notion: MagicMock, get_tasks):
+    def test_yesterday_tasks(self, notion: MagicMock, get_tasks: MagicMock):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         page.yesterday_tasks
 
@@ -177,7 +177,7 @@ class TestWithTasksMixin:
             query_filter=expected_query_filter,
         )
 
-    def test_today_tasks(self, notion: MagicMock, get_tasks):
+    def test_today_tasks(self, notion: MagicMock, get_tasks: MagicMock):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         page.today_tasks
 
@@ -197,7 +197,7 @@ class TestWithTasksMixin:
             query_filter=expected_query_filter,
         )
 
-    def test_tomorrow_tasks(self, notion: MagicMock, get_tasks):
+    def test_tomorrow_tasks(self, notion: MagicMock, get_tasks: MagicMock):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         page.tomorrow_tasks
 
@@ -217,7 +217,7 @@ class TestWithTasksMixin:
             query_filter=expected_query_filter,
         )
 
-    def test_get_completed_tasks(self, notion: MagicMock, get_tasks):
+    def test_get_completed_tasks(self, notion: MagicMock, get_tasks: MagicMock):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         page.get_completed_tasks()
 
