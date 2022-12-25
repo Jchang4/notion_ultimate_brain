@@ -3,4 +3,4 @@ from notion_ultimate_brain.databases.base import UltimateBrainDatabase
 
 
 class MilestonesDatabase(UltimateBrainDatabase):
-    database_id: str = UB_MILESTONES_DATABASE
+    id: str = UB_MILESTONES_DATABASE

@@ -19,8 +19,8 @@ class TestProjectsDatabase:
     def test_default_database_id(self):
         notion = Client()
         projects = ProjectsDatabase(notion)
-        assert projects._raw == {"id": ProjectsDatabase.database_id}
-        assert projects.id == ProjectsDatabase.database_id
+        assert projects._raw == {"id": ProjectsDatabase.id}
+        assert projects.id == ProjectsDatabase.id
 
     def test_update_id_to_pages(self):
         notion = Client()

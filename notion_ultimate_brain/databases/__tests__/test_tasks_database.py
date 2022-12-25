@@ -1,27 +1,25 @@
-from notion_client import Client
+from unittest.mock import MagicMock
 
 from notion_ultimate_brain.databases.tasks import TasksDatabase
+from notion_ultimate_brain.notion.__tests__.helpers import notion_client_fixture
 from notion_ultimate_brain.notion.all import NotionPage
 from notion_ultimate_brain.pages.task import TaskPage
 
 
 class TestTasksDatabase:
-    def test_create(self):
+    def test_create(self, notion: MagicMock):
         raw_data = {"id": "database_id"}
-        notion = Client()
         tasks = TasksDatabase(notion, raw_data)
         assert isinstance(tasks, TasksDatabase)
         assert tasks._raw == raw_data
         assert tasks.id == raw_data["id"]
 
-    def test_default_database_id(self):
-        notion = Client()
+    def test_default_database_id(self, notion: MagicMock):
         tasks = TasksDatabase(notion)
-        assert tasks._raw == {"id": TasksDatabase.database_id}
-        assert tasks.id == TasksDatabase.database_id
+        assert tasks._raw == {"id": TasksDatabase.id}
+        assert tasks.id == TasksDatabase.id
 
-    def test_update_id_to_pages(self):
-        notion = Client()
+    def test_update_id_to_pages(self, notion: MagicMock):
         tasks = TasksDatabase(notion)
 
         assert not tasks.id_to_page

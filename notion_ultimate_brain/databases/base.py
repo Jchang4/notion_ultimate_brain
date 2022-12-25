@@ -7,11 +7,9 @@ from notion_ultimate_brain.notion.all import NotionDatabase
 
 
 class UltimateBrainDatabase(NotionDatabase):
-    database_id: str
-
     def __init__(
         self, notion: Client, data: Optional[JSON] = None, **kargs: Any
     ) -> None:
         if not data:
-            data = {"id": self.database_id}
-        super().__init__(notion, data, **kargs)
+            data = {"id": self.id}
+        super().__init__(notion=notion, data=data, **kargs)

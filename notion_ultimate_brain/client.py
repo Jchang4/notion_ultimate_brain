@@ -44,22 +44,22 @@ class UltimateBrainNotionClient(Client):
     def _ub_database_switch(
         self, database: NotionDatabase
     ) -> Optional[UltimateBrainDatabase]:
-        if database.id == NotesDatabase.database_id:
+        if database.id == NotesDatabase.id:
             self.notes = NotesDatabase(self, database._raw)
             return self.notes
-        elif database.id == MilestonesDatabase.database_id:
+        elif database.id == MilestonesDatabase.id:
             self.milestones = MilestonesDatabase(self, database._raw)
             return self.milestones
-        elif database.id == ProjectsDatabase.database_id:
+        elif database.id == ProjectsDatabase.id:
             self.projects = ProjectsDatabase(self, database._raw)
             return self.projects
-        elif database.id == TasksDatabase.database_id:
+        elif database.id == TasksDatabase.id:
             self.tasks = TasksDatabase(self, database._raw)
             return self.tasks
-        elif database.id == GoalsDatabase.database_id:
+        elif database.id == GoalsDatabase.id:
             self.goals = GoalsDatabase(self, database._raw)
             return self.goals
-        elif database.id == AreasDatabase.database_id:
+        elif database.id == AreasDatabase.id:
             self.areas = AreasDatabase(self, database._raw)
             self.resources = ResourcesDatabase(self, database._raw)
             return self.areas

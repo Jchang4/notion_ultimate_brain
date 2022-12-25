@@ -24,7 +24,7 @@ class WithTasksMixin(NotionPage):
         )
         response = self.notion.databases.query(
             **{
-                "database_id": TasksDatabase.database_id,
+                "database_id": TasksDatabase.id,
                 "filter": task_filter,
             }
         )

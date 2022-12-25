@@ -56,7 +56,7 @@ class TestWithTasksMixin:
         page.base_task_filter = expected_base_task_filter
         child_tasks = page.get_tasks()
         notion.databases.query.assert_called_once_with(
-            database_id=TasksDatabase.database_id,
+            database_id=TasksDatabase.id,
             filter={"and": [expected_base_task_filter], "or": []},
         )
 
@@ -74,7 +74,7 @@ class TestWithTasksMixin:
         page.base_task_filter = expected_base_task_filter
         child_tasks = page.get_tasks({"or": expected_or_filter})
         notion.databases.query.assert_called_once_with(
-            database_id=TasksDatabase.database_id,
+            database_id=TasksDatabase.id,
             filter={"and": [expected_base_task_filter], "or": expected_or_filter},
         )
 
@@ -84,7 +84,7 @@ class TestWithTasksMixin:
         page.base_task_filter = expected_base_task_filter
         page.all_tasks
         notion.databases.query.assert_called_once_with(
-            database_id=TasksDatabase.database_id,
+            database_id=TasksDatabase.id,
             filter={"and": [expected_base_task_filter], "or": []},
         )
 

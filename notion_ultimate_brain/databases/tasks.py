@@ -7,7 +7,7 @@ from notion_ultimate_brain.pages.all import TaskPage
 
 
 class TasksDatabase(UltimateBrainDatabase):
-    database_id: str = UB_TASKS_DATABASE
+    id: str = UB_TASKS_DATABASE
     id_to_page: Dict[str, TaskPage]
 
     def _update_id_to_pages(self, pages: List[NotionPage]) -> None:

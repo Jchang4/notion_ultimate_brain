@@ -8,7 +8,7 @@ from notion_ultimate_brain.pages.all import ProjectPage
 
 
 class ProjectsDatabase(UltimateBrainDatabase):
-    database_id: str = UB_PROJECTS_DATABASE
+    id: str = UB_PROJECTS_DATABASE
     id_to_page: Dict[str, ProjectPage]
 
     def _update_id_to_pages(self, pages: List[NotionPage]) -> None:

@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Tuple, TypeVar, Union
+from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
 
 from dateutil import parser
 
@@ -38,14 +38,18 @@ def get_start_and_end_of_day(offset_days: int = 0) -> Tuple[datetime, datetime]:
     return day, day.replace(hour=23, minute=59, second=59)
 
 
-def query_filter_merge(*dicts) -> JSON:
+def query_filter_merge(*dicts: Optional[JSON]) -> JSON:
     result = {
         "and": [],
         "or": [],
     }
     for d in dicts:
+        if not d:
+            continue
+
         if "and" in d:
             result["and"] += d["and"]
         if "or" in d:
             result["or"] += d["or"]
+
     return result
