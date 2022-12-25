@@ -1,29 +1,15 @@
+from unittest.mock import MagicMock
+
 import pytest
-from notion_client import Client
-from notion_client.api_endpoints import DatabasesEndpoint
 from pytest_mock import MockerFixture
 
 from notion_ultimate_brain.databases.tasks import TasksDatabase
 from notion_ultimate_brain.helpers import (get_start_and_end_of_day, timedelta,
                                            to_notion_strftime)
-from notion_ultimate_brain.notion.__tests__.helpers import TEST_PAGE_DATA
+from notion_ultimate_brain.notion.__tests__.helpers import (
+    TEST_PAGE_DATA, notion_client_fixture)
 from notion_ultimate_brain.notion.all import NotionPage
 from notion_ultimate_brain.pages.task import TaskPage, WithTasksMixin
-
-
-@pytest.fixture(name="notion")
-def notion_client_fixture(mocker: MockerFixture) -> Client:
-    copied_test_page_data = []
-    for i in range(10):
-        page_data = TEST_PAGE_DATA.copy()
-        page_data["id"] = f"page_id_{i}"
-        copied_test_page_data.append(page_data)
-
-    mocker.patch(
-        "notion_client.api_endpoints.DatabasesEndpoint.query",
-        return_value={"results": copied_test_page_data},
-    )
-    return Client()
 
 
 @pytest.fixture()
@@ -45,32 +31,31 @@ def get_expected_base_task_filter():
 
 
 class TestTaskPage:
-    def test_create(self, notion: Client):
+    def test_create(self, notion: MagicMock):
         page = TaskPage(TasksDatabase(notion), TEST_PAGE_DATA)
         assert isinstance(page, NotionPage)
         assert page.id == TEST_PAGE_DATA["id"]
         assert page._raw == TEST_PAGE_DATA
 
-    def test_base_task_filter(self, notion: Client, get_expected_base_task_filter):
-        notion = Client()
+    def test_base_task_filter(self, notion: MagicMock, get_expected_base_task_filter):
         expected_base_task_filter = get_expected_base_task_filter(TEST_PAGE_DATA["id"])
         page = TaskPage(TasksDatabase(notion), TEST_PAGE_DATA)
         assert page.base_task_filter == expected_base_task_filter
 
 
 class TestWithTasksMixin:
-    def test_create(self, notion: Client):
+    def test_create(self, notion: MagicMock):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         assert isinstance(page, NotionPage)
         assert page.id == TEST_PAGE_DATA["id"]
         assert page._raw == TEST_PAGE_DATA
 
-    def test_get_tasks__basic(self, notion: Client, get_expected_base_task_filter):
+    def test_get_tasks__basic(self, notion: MagicMock, get_expected_base_task_filter):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         expected_base_task_filter = get_expected_base_task_filter(TEST_PAGE_DATA["id"])
         page.base_task_filter = expected_base_task_filter
         child_tasks = page.get_tasks()
-        DatabasesEndpoint.query.assert_called_once_with(
+        notion.databases.query.assert_called_once_with(
             database_id=TasksDatabase.database_id,
             filter={"and": [expected_base_task_filter], "or": []},
         )
@@ -79,7 +64,7 @@ class TestWithTasksMixin:
             assert isinstance(child_task, TaskPage)
 
     def test_get_tasks__with_or_filter(
-        self, notion: Client, get_expected_base_task_filter
+        self, notion: MagicMock, get_expected_base_task_filter
     ):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         expected_base_task_filter = get_expected_base_task_filter(TEST_PAGE_DATA["id"])
@@ -88,23 +73,22 @@ class TestWithTasksMixin:
         ]
         page.base_task_filter = expected_base_task_filter
         child_tasks = page.get_tasks({"or": expected_or_filter})
-        DatabasesEndpoint.query.assert_called_once_with(
+        notion.databases.query.assert_called_once_with(
             database_id=TasksDatabase.database_id,
             filter={"and": [expected_base_task_filter], "or": expected_or_filter},
         )
 
-    def test_all_tasks(self, notion: Client, get_expected_base_task_filter):
+    def test_all_tasks(self, notion: MagicMock, get_expected_base_task_filter):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         expected_base_task_filter = get_expected_base_task_filter(TEST_PAGE_DATA["id"])
         page.base_task_filter = expected_base_task_filter
-
         page.all_tasks
-        DatabasesEndpoint.query.assert_called_once_with(
+        notion.databases.query.assert_called_once_with(
             database_id=TasksDatabase.database_id,
             filter={"and": [expected_base_task_filter], "or": []},
         )
 
-    def test_get_current_tasks(self, notion: Client, mock_get_tasks):
+    def test_get_current_tasks(self, notion: MagicMock, mock_get_tasks):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
 
         expected_query_filter = {
@@ -118,7 +102,7 @@ class TestWithTasksMixin:
             query_filter=expected_query_filter,
         )
 
-    def test_get_current_tasks__include_done(self, notion: Client, mock_get_tasks):
+    def test_get_current_tasks__include_done(self, notion: MagicMock, mock_get_tasks):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
 
         expected_query_filter = {
@@ -132,7 +116,7 @@ class TestWithTasksMixin:
         )
 
     def test_get_current_tasks__include_kanban_done(
-        self, notion: Client, mock_get_tasks
+        self, notion: MagicMock, mock_get_tasks
     ):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         expected_query_filter = {
@@ -146,7 +130,7 @@ class TestWithTasksMixin:
         )
 
     def test_get_current_tasks__include_both_done_and_kanban_done(
-        self, notion: Client, mock_get_tasks
+        self, notion: MagicMock, mock_get_tasks
     ):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         expected_query_filter = {"and": []}
@@ -155,7 +139,7 @@ class TestWithTasksMixin:
             query_filter=expected_query_filter,
         )
 
-    def test_get_current_tasks_with_offset(self, notion: Client, mock_get_tasks):
+    def test_get_current_tasks_with_offset(self, notion: MagicMock, mock_get_tasks):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         page.get_current_tasks_with_offset()
 
@@ -175,7 +159,7 @@ class TestWithTasksMixin:
             query_filter=expected_query_filter,
         )
 
-    def test_yesterday_tasks(self, notion: Client, mock_get_tasks):
+    def test_yesterday_tasks(self, notion: MagicMock, mock_get_tasks):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         page.yesterday_tasks
 
@@ -193,7 +177,7 @@ class TestWithTasksMixin:
             query_filter=expected_query_filter,
         )
 
-    def test_today_tasks(self, notion: Client, mock_get_tasks):
+    def test_today_tasks(self, notion: MagicMock, mock_get_tasks):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         page.today_tasks
 
@@ -213,7 +197,7 @@ class TestWithTasksMixin:
             query_filter=expected_query_filter,
         )
 
-    def test_tomorrow_tasks(self, notion: Client, mock_get_tasks):
+    def test_tomorrow_tasks(self, notion: MagicMock, mock_get_tasks):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         page.tomorrow_tasks
 
@@ -233,7 +217,7 @@ class TestWithTasksMixin:
             query_filter=expected_query_filter,
         )
 
-    def test_get_completed_tasks(self, notion: Client, mock_get_tasks):
+    def test_get_completed_tasks(self, notion: MagicMock, mock_get_tasks):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
         page.get_completed_tasks()
 
@@ -249,7 +233,7 @@ class TestWithTasksMixin:
             query_filter=expected_query_filter,
         )
 
-    def test_task_ids(self, notion: Client):
+    def test_task_ids(self, notion: MagicMock):
         page = WithTasksMixin(TasksDatabase(notion), TEST_PAGE_DATA)
 
         expected_task_ids = TEST_PAGE_DATA["properties"]["Tasks"]["relation"]

@@ -1,16 +1,16 @@
-from notion_client import Client
+from unittest.mock import MagicMock
 
 from notion_ultimate_brain.notion.__tests__.helpers import (
     TEST_DATABASE_DATA,
     TEST_PAGE_DATA,
+    notion_client_fixture,
 )
 from notion_ultimate_brain.notion.database import NotionDatabase
 from notion_ultimate_brain.notion.page import NotionPage
 
 
 class TestNotionPage:
-    def test_create(self):
-        notion = Client()
+    def test_create(self, notion: MagicMock):
         database = NotionDatabase(notion, TEST_DATABASE_DATA)
         page = NotionPage(database, TEST_PAGE_DATA)
         assert page is not None

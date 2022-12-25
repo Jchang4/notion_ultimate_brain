@@ -1,3 +1,48 @@
+from unittest.mock import MagicMock
+
+import pytest
+from pytest_mock import MockerFixture
+
+from notion_ultimate_brain.notion.database import NotionDatabase
+from notion_ultimate_brain.notion.page import NotionPage
+
+
+@pytest.fixture(name="notion")
+def notion_client_fixture(mocker: MockerFixture) -> MagicMock:
+    copied_test_page_data = []
+    for i in range(10):
+        page_data = TEST_PAGE_DATA.copy()
+        page_data["id"] = f"page_id_{i}"
+        copied_test_page_data.append(page_data)
+
+    mock_Client = mocker.patch("notion_client.client.Client")
+    mock_Client.databases = mocker.Mock(
+        query=mocker.Mock(return_value={"results": copied_test_page_data})
+    )
+
+    mock_Client.search = mocker.Mock({"results": copied_test_page_data})
+
+    return mock_Client
+
+
+@pytest.fixture(name="get_pages")
+def get_pages_fixture(mocker: MockerFixture, notion: MagicMock) -> MagicMock:
+    database = NotionDatabase(notion, TEST_DATABASE_DATA)
+
+    id_to_page = {}
+    for i in range(10):
+        page_data = TEST_PAGE_DATA.copy()
+        page_data["id"] = f"page_id_{i}"
+        page = NotionPage(database, page_data)
+        id_to_page[page.id] = page
+
+    mock_get_pages = mocker.patch(
+        "notion_ultimate_brain.notion.database.NotionDatabase.get_pages",
+        return_value=id_to_page,
+    )
+    return mock_get_pages
+
+
 TEST_DATABASE_DATA = {
     "object": "database",
     "id": "notion-database-id",
@@ -158,7 +203,7 @@ TEST_PAGE_DATA = {
             "title": [
                 {
                     "type": "text",
-                    "text": {"content": "Reduce Usage", "link": None},
+                    "text": {"content": "Notion Page Title", "link": None},
                     "annotations": {
                         "bold": False,
                         "italic": False,
@@ -167,7 +212,7 @@ TEST_PAGE_DATA = {
                         "code": False,
                         "color": "default",
                     },
-                    "plain_text": "Reduce Usage",
+                    "plain_text": "Notion Page Title",
                     "href": None,
                 }
             ],

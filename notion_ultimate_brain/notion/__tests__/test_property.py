@@ -1,16 +1,15 @@
-from notion_client import Client
+from unittest.mock import MagicMock
 
 from notion_ultimate_brain.notion.__tests__.helpers import (
     TEST_DATABASE_DATA,
     TEST_PAGE_DATA,
+    notion_client_fixture,
 )
 from notion_ultimate_brain.notion.property import Property
 
 
 class TestProperty:
-    def test_create__database(self):
-        notion = Client()
-
+    def test_create_database(self, notion: MagicMock):
         actual_properties = [
             Property(notion=notion, json_data=prop, prop_name=prop_name)
             for prop_name, prop in TEST_DATABASE_DATA["properties"].items()
@@ -23,9 +22,7 @@ class TestProperty:
             assert actual_prop.type == expected_prop["type"]
             assert actual_prop.value == expected_prop[actual_prop.type]
 
-    def test_create__page(self):
-        notion = Client()
-
+    def test_create_page(self, notion: MagicMock):
         actual_properties = {
             prop["id"]: Property(notion=notion, json_data=prop, prop_name=prop_name)
             for prop_name, prop in TEST_PAGE_DATA["properties"].items()
@@ -38,8 +35,7 @@ class TestProperty:
             assert actual_prop.type == expected_prop["type"]
             assert actual_prop.value == expected_prop[actual_prop.type]
 
-    def test_get_value(self):
-        notion = Client()
+    def test_get_value(self, notion: MagicMock):
         expected_property = next(iter(TEST_PAGE_DATA["properties"].values()))
         actual_property = Property(
             notion=notion, json_data=expected_property, prop_name="prop_name"

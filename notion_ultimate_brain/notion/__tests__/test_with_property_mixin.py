@@ -1,15 +1,15 @@
-from notion_client import Client
+from unittest.mock import MagicMock
 
 from notion_ultimate_brain.notion.__tests__.helpers import (
     TEST_DATABASE_DATA,
     TEST_PAGE_DATA,
+    notion_client_fixture,
 )
 from notion_ultimate_brain.notion.property import Property, WithProperties
 
 
 class TestWithProperties:
-    def test_create__database(self):
-        notion = Client()
+    def test_create__database(self, notion: MagicMock):
         mixin = WithProperties(
             notion=notion, properties=TEST_DATABASE_DATA["properties"]
         )
@@ -20,8 +20,7 @@ class TestWithProperties:
             assert prop.id == prop_id
             assert prop._raw == TEST_DATABASE_DATA["properties"][prop.name]
 
-    def test_create__page(self):
-        notion = Client()
+    def test_create__page(self, notion: MagicMock):
         mixin = WithProperties(notion=notion, properties=TEST_PAGE_DATA["properties"])
         assert mixin.notion == notion
         assert len(mixin.id_to_property) == len(TEST_PAGE_DATA["properties"])
@@ -30,9 +29,7 @@ class TestWithProperties:
             assert prop.id == prop_id
             assert prop._raw == TEST_PAGE_DATA["properties"][prop.name]
 
-    def test_get_prop_by_id(self):
-        notion = Client()
-
+    def test_get_prop_by_id(self, notion: MagicMock):
         mixin = WithProperties(
             notion=notion, properties=TEST_DATABASE_DATA["properties"]
         )
@@ -42,9 +39,7 @@ class TestWithProperties:
                 notion=notion, json_data=prop, prop_name=prop_name
             )
 
-    def test_get_prop_by_name(self):
-        notion = Client()
-
+    def test_get_prop_by_name(self, notion: MagicMock):
         # Database
         mixin = WithProperties(
             notion=notion, properties=TEST_DATABASE_DATA["properties"]
@@ -63,9 +58,7 @@ class TestWithProperties:
                 notion=notion, json_data=prop, prop_name=prop_name
             )
 
-    def test_get_props_by_type(self):
-        notion = Client()
-
+    def test_get_props_by_type(self, notion: MagicMock):
         mixin = WithProperties(
             notion=notion, properties=TEST_DATABASE_DATA["properties"]
         )
@@ -76,8 +69,7 @@ class TestWithProperties:
                 in actual_props
             )
 
-    def test_properties(self):
-        notion = Client()
+    def test_properties(self, notion: MagicMock):
         mixin = WithProperties(notion=notion, properties=TEST_PAGE_DATA["properties"])
         actual_props = mixin.properties
         for actual_prop in actual_props:

@@ -21,7 +21,7 @@ class NotionDatabase(NotionBase):
     def get_pages(
         self, query_filter: Optional[Dict[str, Any]] = None
     ) -> Dict[str, NotionPage]:
-        response = self.notion.databases.query(self.id, filter=query_filter)
+        response = self.notion.databases.query(database_id=self.id, filter=query_filter)
         assert isinstance(response, dict)
         pages = []
         for data in response["results"]:
