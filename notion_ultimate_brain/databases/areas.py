@@ -3,7 +3,7 @@ from typing import Dict, List
 from notion_ultimate_brain.constants import UB_AREAS_AND_RESOURCES_DATABASE
 from notion_ultimate_brain.databases.base import UltimateBrainDatabase
 from notion_ultimate_brain.helpers import JSON
-from notion_ultimate_brain.notion.page import NotionPage
+from notion_ultimate_brain.notion.all import NotionPage
 from notion_ultimate_brain.pages.area import AreaPage
 
 

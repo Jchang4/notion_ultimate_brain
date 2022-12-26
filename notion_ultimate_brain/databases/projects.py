@@ -4,7 +4,7 @@ from notion_ultimate_brain.constants import UB_PROJECTS_DATABASE
 from notion_ultimate_brain.databases.base import UltimateBrainDatabase
 from notion_ultimate_brain.helpers import get_day_midnight, to_notion_strftime
 from notion_ultimate_brain.notion.all import NotionPage
-from notion_ultimate_brain.pages.all import ProjectPage
+from notion_ultimate_brain.pages.project import ProjectPage
 
 
 class ProjectsDatabase(UltimateBrainDatabase):

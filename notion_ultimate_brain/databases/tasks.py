@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 from notion_ultimate_brain.constants import UB_TASKS_DATABASE
 from notion_ultimate_brain.databases.base import UltimateBrainDatabase
 from notion_ultimate_brain.notion.all import NotionPage
-from notion_ultimate_brain.pages.all import TaskPage
+from notion_ultimate_brain.pages.task import TaskPage
 
 
 class TasksDatabase(UltimateBrainDatabase):
